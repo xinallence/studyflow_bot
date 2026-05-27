@@ -1,22 +1,23 @@
 import json
 from pathlib import Path
 
-DATA_FILE = Path("data/tasks.json")
-
 
 class TaskService:
-    def __init__(self):
+    def __init__(self, data_file="data/tasks.json"):
+        self.data_file = Path(data_file)
         self.tasks = self.load_tasks()
 
     def load_tasks(self):
-        if not DATA_FILE.exists():
+        if not self.data_file.exists():
             return []
 
-        with open(DATA_FILE, "r", encoding="utf-8") as file:
+        with open(self.data_file, "r", encoding="utf-8") as file:
             return json.load(file)
 
     def save_tasks(self):
-        with open(DATA_FILE, "w", encoding="utf-8") as file:
+        self.data_file.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(self.data_file, "w", encoding="utf-8") as file:
             json.dump(self.tasks, file, indent=4)
 
     def add_task(self, title):
@@ -27,6 +28,8 @@ class TaskService:
 
         self.tasks.append(task)
         self.save_tasks()
+
+        return task
 
     def get_tasks(self):
         return self.tasks
